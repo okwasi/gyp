@@ -612,7 +612,11 @@ class XcodeSettings(object):
     libtoolflags = []
 
     for libtoolflag in self._Settings().get('OTHER_LDFLAGS', []):
-      libtoolflags.append(libtoolflag)
+      # Explicitly avoid including the -stdlib=libc++ directive, since
+      # libtool passes all linker flags to ld, and not clang/clang++.
+      # While clang/clang++ understand the said flag, ld does not.
+      if libtoolflag != '-stdlib=libc++':
+        libtoolflags.append(libtoolflag)
     # TODO(thakis): ARCHS?
 
     self.configname = None
